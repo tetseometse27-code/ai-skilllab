@@ -133,6 +133,16 @@ MSFC_CURRICULUM = {
 # ---- PAGE CONFIG ----
 st.set_page_config(page_title="AI SkillLab", page_icon="🤖", layout="wide")
 
+# ---- USAGE LIMIT CONTROL ----
+if "request_count" not in st.session_state:
+    st.session_state.request_count = 0
+
+MAX_REQUESTS = 10
+
+if st.session_state.request_count >= MAX_REQUESTS:
+    st.error("Usage limit reached for this session.")
+    st.stop()
+
 # ---- APP NAVIGATION ----
 
 page = st.sidebar.radio(
@@ -947,7 +957,7 @@ if page == "Create Lesson":
 
     Do NOT include Reflection by Trainer.
     """
-
+            st.session_state.request_count += 1
             lesson = client.chat.completions.create(
                 model="gpt-4.1-mini", messages=[{"role": "user", "content": lesson_prompt}]
             )
@@ -1039,7 +1049,7 @@ if page == "Create Lesson":
 
                 FORMAT CLEANLY. NO EXTRA TEXT.
                 """
-
+                st.session_state.request_count += 1
                 worksheet = client.chat.completions.create(
                     model="gpt-4.1-mini",
                     messages=[{"role": "user", "content": worksheet_prompt}],
@@ -1068,7 +1078,7 @@ if page == "Create Lesson":
                         Focus primarily on the concepts mentioned in the textbook.
                         Avoid introducing topics not present in the textbook.
                         """
-
+                st.session_state.request_count += 1
                 quiz = client.chat.completions.create(
                     model="gpt-4.1-mini",
                     messages=[{"role": "user", "content": quiz_prompt}],
